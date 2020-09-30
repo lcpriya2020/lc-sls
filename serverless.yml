@@ -1,0 +1,277 @@
+
+service: jaamslsapi
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-2  
+  apiGateway:
+    binaryMediaTypes:
+      - "image/png"
+  environment:    
+    MEETINGS_TABLE: { "Ref": "meetings" } #Logical ID
+    USERS_TABLE: { "Ref": "users" }
+    CONTACTUS_TABLE: { "Ref": "contactus" }
+    FEEDBACKS_TABLE: { "Ref": "feedbacks" }
+    PARTNERSHIPS_TABLE: { "Ref": "partnership" }    
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:Scan
+        - dynamodb:Query 
+      Resource: 
+        - { "Fn::GetAtt": ["meetings", "Arn"] }
+        - { "Fn::GetAtt": ["users", "Arn"] }
+        - { "Fn::GetAtt": ["contactus", "Arn"] }
+        - { "Fn::GetAtt": ["feedbacks", "Arn"] }
+        - { "Fn::GetAtt": ["partnership", "Arn"] }        
+
+resources:
+  Resources:
+    meetings:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "meetings"
+        AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+        KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    users:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "users"
+        AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+        KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    contactus:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "contact"
+        AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+        KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    feedbacks:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "feedbacks"
+        AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+        KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    partnership:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "partnership"
+        AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+        KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+functions:
+  postusers:
+    handler: handler.postusers
+    environment:
+      TABLENAME: { "Ref": "users" }
+    events:
+      - http:
+          path: /users
+          method: post  
+          cors: true   
+  getusers:
+    handler: handler.getusers
+    environment:
+      TABLENAME: { "Ref": "users" }
+    events:
+      - http:
+          path: /users
+          method: get  
+          cors: true   
+  postmeeting:
+    handler: handler.postmeeting
+    environment:
+      TABLENAME: { "Ref": "meetings" }
+    events:
+      - http:
+          path: /meeting
+          method: post  
+          cors: true   
+  getmeeting:
+    handler: handler.getmeeting
+    environment:
+      TABLENAME: { "Ref": "meetings" }
+    events:
+      - http:
+          path: /meeting
+          method: get  
+          cors: true   
+  getonemeeting:
+    handler: handler.getonemeeting
+    environment:
+      TABLENAME: { "Ref": "meetings" }
+    events:
+      - http:
+          path: /meeting/{id}
+          method: get  
+          cors: true  
+  updatemeeting:
+    handler: handler.updatemeeting
+    environment:
+      TABLENAME: { "Ref": "meetings" }
+    events:
+      - http:
+          path: /meeting/{id}
+          method: put  
+          cors: true   
+  deletemeeting:
+    handler: handler.deletemeeting
+    environment:
+      TABLENAME: { "Ref": "meetings" }
+    events:
+      - http:
+          path: /meeting/{id}
+          method: delete  
+          cors: true   
+  postcontactus:
+    handler: contactus/handler.postcontactus
+    environment:
+      TABLENAME: { "Ref": "contactus" }
+    events:
+      - http:
+          path: /contactus
+          method: post
+          cors: true   
+  getcontactus:
+    handler: contactus/handler.getcontactus
+    environment:
+      TABLENAME: { "Ref": "contactus" }
+    events:
+      - http:
+          path: /contactus
+          method: get
+          cors: true      
+  postfeedback:
+    handler: feedback/handler.postfeedback
+    environment:
+      TABLENAME: { "Ref": "feedbacks" }
+    events:
+      - http:
+          path: /feedback
+          method: post  
+          cors: true   
+  getfeedback:
+    handler: feedback/handler.getfeedback
+    environment:
+      TABLENAME: { "Ref": "feedbacks" }
+    events:
+      - http:
+          path: /feedback
+          method: get
+          cors: true     
+  postpartnership:
+    handler: partnership/handler.postpartnership
+    environment:
+      TABLENAME: { "Ref": "partnership" }
+    events:
+      - http:
+          path: /partnership
+          method: post  
+          cors: true   
+  getpartnership:
+    handler: partnership/handler.getpartnership
+    environment:
+      TABLENAME: { "Ref": "partnership" }
+    events:
+      - http:
+          path: /partnership
+          method: get
+          cors: true             
+#    The following are a few example events you can configure
+#    NOTE: Please make sure to change your handler code to work with those events
+#    Check the event documentation for details
+#    events:
+#      - http:
+#          path: users/create
+#          method: get
+#      - websocket: $connect
+#      - s3: ${env:BUCKET}
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
+#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
+#      - iot:
+#          sql: "SELECT * FROM 'some_topic'"
+#      - cloudwatchEvent:
+#          event:
+#            source:
+#              - "aws.ec2"
+#            detail-type:
+#              - "EC2 Instance State-change Notification"
+#            detail:
+#              state:
+#                - pending
+#      - cloudwatchLog: '/aws/lambda/hello'
+#      - cognitoUserPool:
+#          pool: MyUserPool
+#          trigger: PreSignUp
+#      - alb:
+#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
+#          priority: 1
+#          conditions:
+#            host: example.com
+#            path: /hello
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+# you can add CloudFormation resource templates here
+#resources:
+#  Resources:
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"
