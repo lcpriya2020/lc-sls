@@ -16,9 +16,9 @@ module.exports.postfeedback = async (event, context, callback) => {
       Item: {
         id: uuidv4(),
         createdTime: Date.now(),
-        tellus: data.tellus,
-        tellusinfo: data.tellusinfo,
-        feedbackimg: data.feedbackimg
+        feedbackAbout: data.feedbackAbout,
+        feedback: data.feedback,
+        feedbackImg: "no-image"
       }
     };
   

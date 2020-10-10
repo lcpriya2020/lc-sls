@@ -19,7 +19,7 @@ provider:
     USERS_TABLE: { "Ref": "users" }
     CONTACTUS_TABLE: { "Ref": "contactus" }
     FEEDBACKS_TABLE: { "Ref": "feedbacks" }
-    PARTNERSHIPS_TABLE: { "Ref": "partnership" }    
+    PARTNERSHIPS_TABLE: { "Ref": "partnership" }
 
   iamRoleStatements:
     - Effect: "Allow"
@@ -31,13 +31,20 @@ provider:
         - dynamodb:DeleteItem
         - dynamodb:Scan
         - dynamodb:Query 
+        - ses:SendEmail
+        - ses:SendRawEmail
+        - ses:SendTemplatedEmail
+        - lambda:InvokeFunction
+        - lambda:InvokeAsync
       Resource: 
         - { "Fn::GetAtt": ["meetings", "Arn"] }
         - { "Fn::GetAtt": ["users", "Arn"] }
         - { "Fn::GetAtt": ["contactus", "Arn"] }
         - { "Fn::GetAtt": ["feedbacks", "Arn"] }
-        - { "Fn::GetAtt": ["partnership", "Arn"] }        
-
+        - { "Fn::GetAtt": ["partnership", "Arn"] }   
+        - "arn:aws:ses:${self:provider.region}:*:*"
+        - "arn:aws:lambda:${self:provider.region}:*:*"
+        
 resources:
   Resources:
     meetings:
@@ -174,6 +181,7 @@ functions:
     handler: contactus/handler.postcontactus
     environment:
       TABLENAME: { "Ref": "contactus" }
+      FUNCTIONNAME: '${self:service}-${self:provider.stage}-sendemail'
     events:
       - http:
           path: /contactus
@@ -223,7 +231,10 @@ functions:
       - http:
           path: /partnership
           method: get
-          cors: true             
+          cors: true  
+  sendemail:
+    handler: ses_email/handler.sendemail
+     
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

@@ -2,15 +2,76 @@
 const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
 
+const lambda = new AWS.Lambda();
+
 // Post Contactus details
-module.exports.postcontactus = async (event, context, callback) => {
+module.exports.postcontactus = async (event, context, callback) => {         
+  let responseBody = '';
+  let statusCode = 0;    
+  const data = JSON.parse(event.body);
+
+  // Send email
+  const lambdaName = process.env.FUNCTIONNAME;
+    
+  const toEmailVal = "contactsales@jaam.co";    // To user - data.email
+  const fromEmailVal = "contactsales@jaam.co";
+  const contactTemplate = "CONTACT_SALES_JAAM";
+  const contactTemplatedata = data;
+
+  const payloadStr = JSON.stringify({
+    fromEmail: fromEmailVal, 
+    toEmail: toEmailVal,
+    templateName: contactTemplate,
+    templateData: contactTemplatedata
+  });
+  
+  const params = {
+    FunctionName: lambdaName,
+    InvocationType: 'Event',
+    Payload: payloadStr    
+  };
+
+  try {
+    const result = await lambda.invoke(params).promise();     
+    responseBody = JSON.stringify(result, null, 2);
+    statusCode = 200;
+  } catch(err) {
+    responseBody = `Unable to send email ${err}`;
+    statusCode = 403;
+  } 
+
+  // To user
+  const toEmailValuser = data.email;    // To user - data.email
+  const fromEmailValuser = "contactsales@jaam.co";
+  const contactTemplateuser = "CONTACT_SALES_ACK";
+  const contactTemplatedatauser = data;
+
+  const userpayloadStr = JSON.stringify({
+    fromEmail: fromEmailValuser, 
+    toEmail: toEmailValuser,
+    templateName: contactTemplateuser,
+    templateData: contactTemplatedatauser
+  });
+  
+  const userparams = {
+    FunctionName: lambdaName,
+    InvocationType: 'Event',
+    Payload: userpayloadStr    
+  };
+
+  try {
+    const result = await lambda.invoke(userparams).promise();     
+    responseBody = JSON.stringify(result, null, 2);
+    statusCode = 200;
+  } catch(err) {
+    responseBody = `Unable to send email ${err}`;
+    statusCode = 403;
+  } 
+
+  // Insert Contact data into DB    
     const db = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
     const contactTable = process.env.TABLENAME;
-      
-    let responseBody = '';
-    let statusCode = 0;
-    
-    const data = JSON.parse(event.body);
+
     const contactData = {
       TableName: contactTable,
       Item: {
@@ -22,7 +83,7 @@ module.exports.postcontactus = async (event, context, callback) => {
         phone: data.phone,
         country: data.country,
         state: data.state,
-        zipcode: data.zipCode,
+        zipCode: data.zipCode,
         info: data.additionalInfo
       }
     };
