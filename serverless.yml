@@ -112,28 +112,9 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-
-functions:
-  postusers:
-    handler: handler.postusers
-    environment:
-      TABLENAME: { "Ref": "users" }
-    events:
-      - http:
-          path: /users
-          method: post  
-          cors: true   
-  getusers:
-    handler: handler.getusers
-    environment:
-      TABLENAME: { "Ref": "users" }
-    events:
-      - http:
-          path: /users
-          method: get  
-          cors: true   
+functions:   
   postmeeting:
-    handler: handler.postmeeting
+    handler: meetings/handler.postmeeting
     environment:
       TABLENAME: { "Ref": "meetings" }
     events:
@@ -142,7 +123,7 @@ functions:
           method: post  
           cors: true   
   getmeeting:
-    handler: handler.getmeeting
+    handler: meetings/handler.getmeeting
     environment:
       TABLENAME: { "Ref": "meetings" }
     events:
@@ -151,7 +132,7 @@ functions:
           method: get  
           cors: true   
   getonemeeting:
-    handler: handler.getonemeeting
+    handler: meetings/handler.getonemeeting
     environment:
       TABLENAME: { "Ref": "meetings" }
     events:
@@ -160,7 +141,7 @@ functions:
           method: get  
           cors: true  
   updatemeeting:
-    handler: handler.updatemeeting
+    handler: meetings/handler.updatemeeting
     environment:
       TABLENAME: { "Ref": "meetings" }
     events:
@@ -169,7 +150,7 @@ functions:
           method: put  
           cors: true   
   deletemeeting:
-    handler: handler.deletemeeting
+    handler: meetings/handler.deletemeeting
     environment:
       TABLENAME: { "Ref": "meetings" }
     events:
@@ -231,7 +212,25 @@ functions:
       - http:
           path: /partnership
           method: get
-          cors: true  
+          cors: true
+  postusers:
+    handler: users/handler.postusers
+    environment:
+      TABLENAME: { "Ref": "users" }
+    events:
+      - http:
+          path: /users
+          method: post  
+          cors: true
+  getusers:
+    handler: users/handler.getusers
+    environment:
+      TABLENAME: { "Ref": "users" }
+    events:
+      - http:
+          path: /users
+          method: get  
+          cors: true
   sendemail:
     handler: ses_email/handler.sendemail
      
