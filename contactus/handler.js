@@ -3,6 +3,9 @@ const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
 
 const lambda = new AWS.Lambda();
+const contactemail = "contactsales@jaam.co";
+const contactTemplate = "CONTACT_SALES_JAAM";
+const contactTemplateuser = "CONTACT_SALES_ACK";
 
 // Post Contactus details
 module.exports.postcontactus = async (event, context, callback) => {         
@@ -13,9 +16,8 @@ module.exports.postcontactus = async (event, context, callback) => {
   // Send email
   const lambdaName = process.env.FUNCTIONNAME;
     
-  const toEmailVal = "contactsales@jaam.co";    // To user - data.email
-  const fromEmailVal = "contactsales@jaam.co";
-  const contactTemplate = "CONTACT_SALES_JAAM";
+  const toEmailVal = contactemail;   // To user - data.email
+  const fromEmailVal = contactemail;  
   const contactTemplatedata = data;
 
   const payloadStr = JSON.stringify({
@@ -42,8 +44,7 @@ module.exports.postcontactus = async (event, context, callback) => {
 
   // To user
   const toEmailValuser = data.email;    // To user - data.email
-  const fromEmailValuser = "contactsales@jaam.co";
-  const contactTemplateuser = "CONTACT_SALES_ACK";
+  const fromEmailValuser = contactemail;  
   const contactTemplatedatauser = data;
 
   const userpayloadStr = JSON.stringify({
@@ -107,7 +108,6 @@ module.exports.postcontactus = async (event, context, callback) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        //data
         message: responseBody
       })
     };
