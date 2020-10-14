@@ -124,7 +124,7 @@ functions:
           method: post
           cors: true
   postmeeting:
-    handler: meetings/handler.postmeeting
+    handler: handler.postmeeting
     environment:
       TABLENAME: { "Ref": "meetings" }
     events:
@@ -188,23 +188,14 @@ functions:
           method: get
           cors: true
   postusers:
-    handler: users/handler.postusers
+    handler: handler.postusers
     environment:
       TABLENAME: { "Ref": "users" }
     events:
       - http:
           path: /users
           method: post  
-          cors: true
-  getusers:
-    handler: users/handler.getusers
-    environment:
-      TABLENAME: { "Ref": "users" }
-    events:
-      - http:
-          path: /users
-          method: get  
-          cors: true
+          cors: true 
   sendemail:
     handler: ses_email/handler.sendemail     
 
