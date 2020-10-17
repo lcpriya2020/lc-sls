@@ -23,7 +23,7 @@ module.exports.postmeeting = async (event, context, callback) => {
         email: data.email,
         createdTime: Date.now(),
         theme: data.theme,
-        themeImage: data.themeImage,
+        themeImage: data.themeImage
       }
     };
   

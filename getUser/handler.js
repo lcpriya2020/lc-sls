@@ -33,7 +33,8 @@ module.exports.getUser = async (event, context, callback) => {
           TableName: meetingsTable,              
           ExpressionAttributeValues: {
               ":v_meetingToken":  data.token,
-              ":v_email":  "jit.test2020@gmail.com"
+              //":v_email":  "jit.test2020@gmail.com"
+              ":v_email":  "sundarasokan1@gmail.com"
           },
           FilterExpression: "meetingToken = :v_meetingToken AND email = :v_email"
         };

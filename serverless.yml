@@ -123,6 +123,44 @@ functions:
           path: /getUser
           method: post
           cors: true
+  signup:
+    handler: signup/handler.signup
+    environment:
+      TABLENAME_USERS: { "Ref": "users" }
+      TABLENAME_MEETINGS: { "Ref": "meetings" }
+    events:
+      - http:
+          path: /signup
+          method: post
+          cors: true
+  login:
+    handler: login/handler.login
+    environment:
+      TABLENAME_USERS: { "Ref": "users" }
+      TABLENAME_MEETINGS: { "Ref": "meetings" }
+    events:
+      - http:
+          path: /login
+          method: post
+          cors: true
+  join:
+    handler: join/handler.join
+    environment:
+      TABLENAME_MEETINGS: { "Ref": "meetings" }
+    events:
+      - http:
+          path: /join
+          method: post
+          cors: true
+  updateMeet:
+    handler: updateMeet/handler.updateMeet
+    environment:
+      TABLENAME_MEETINGS: { "Ref": "meetings" }
+    events:
+      - http:
+          path: /updateMeet
+          method: post
+          cors: true
   postmeeting:
     handler: handler.postmeeting
     environment:

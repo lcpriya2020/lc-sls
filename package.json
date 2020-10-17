@@ -4,7 +4,8 @@
   "description": "",
   "main": "handler.js",
   "dependencies": {
-    "uuid": "^8.3.0"
+    "uuid": "^8.3.0",
+    "uuid-token-generator": "^1.0.0"
   },
   "devDependencies": {},
   "scripts": {
