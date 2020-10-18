@@ -12,7 +12,7 @@ module.exports.join = async (event, context, callback) => {
   
   try {
 
-    const meeting = {
+    const meetingData = {
       TableName: meetingsTable,
       ExpressionAttributeValues: {
         ":v_meetingId":  data.roomName
@@ -20,31 +20,31 @@ module.exports.join = async (event, context, callback) => {
     FilterExpression: "meetingId = :v_meetingId"
     };
    
-    var meetingResult = await db.scan(meeting).promise(); 
-    resBodyMeeting = meetingResult.Items;
+    var meetingResult = await db.scan(meetingData).promise(); 
+    //resBodyMeeting = meetingResult.Items;
 
-    // if(meetingResult === null || meetingResult.Items === null || meetingResult.Items.length === 0)
-    // {
-    //   //resBodyMeeting = `Unable to get Meeting details1`;
-    //   statusCode = 403;
-    // }
-    // else
-    // {
-    //   if(data.enablePasscode && data.passcode === '16730')
-    //   {
-    //     resBodyMeeting = JSON.stringify(meetingResult.Items);           
-    //     statusCode = 200;
-    //   }
-    //   else if (!data.enablePasscode) {
-    //     resBodyMeeting = JSON.stringify(meetingResult.Items);           
-    //     statusCode = 200;
-    //   }
-    //   else
-    //   {
-    //     resBodyMeeting = `Unable to get Meeting details2`;
-    //     statusCode = 403;
-    //   }    
-    // }    
+    if(meetingResult === null || meetingResult.Items === null || meetingResult.Items.length === 0)
+    {
+      resBodyMeeting = `Unable to get Meeting details`;
+      statusCode = 403;
+    }
+    else
+    {
+      if(data.enablePasscode && data.passcode === '16730')
+      {
+        resBodyMeeting = JSON.stringify(meetingResult.Items);           
+        statusCode = 200;
+      }
+      else if (!data.enablePasscode) {
+        resBodyMeeting = JSON.stringify(meetingResult.Items);           
+        statusCode = 200;
+      }
+      else
+      {
+        resBodyMeeting = `Unable to get Meeting details`;
+        statusCode = 403;
+      }    
+    }    
   } catch(err) {
     resBodyMeeting = `Unable to get meeting details ${err}`;
     statusCode = 403;

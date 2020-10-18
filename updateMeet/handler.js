@@ -8,6 +8,6 @@ module.exports.updateMeet = async (event, context, callback) => {
   let resBodyUser = '';
   let resBodyMeeting = '';
   let statusCode = 0;
-
+  
   
 };

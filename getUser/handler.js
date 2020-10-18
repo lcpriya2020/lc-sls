@@ -24,6 +24,15 @@ module.exports.getUser = async (event, context, callback) => {
   
     try {
       const usersResult = await db.scan(usersData).promise();
+      
+      if(usersResult === null || usersResult.Items === null || usersResult.Items.length === 0)
+      {
+        resBodyUser = `Unable to get User details`;
+        resBodyMeeting = `Unable to get Meeting details`;
+        statusCode = 403;
+      }
+      else
+      {
       const userList = usersResult.Items;
       const useremail = userList.email;
       console.log(userList);
@@ -48,7 +57,8 @@ module.exports.getUser = async (event, context, callback) => {
         } catch(err) {
           resBodyMeeting = `Unable to retrieve Meeting data ${err}`;
           statusCode = 403;
-        }        
+        }
+      }        
     } catch(err) {
       resBodyUser = `Unable to retrieve User data ${err}`;
       statusCode = 403;
