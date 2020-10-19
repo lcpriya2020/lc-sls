@@ -11,8 +11,7 @@ module.exports.getUser = async (event, context, callback) => {
     let resBodyMeeting = '';
     let statusCode = 0;
 
-    const data = JSON.parse(event.body);
-    console.log(data);
+    const data = JSON.parse(event.body);   
   
     const usersData = {
       TableName: usersTable,
@@ -34,20 +33,16 @@ module.exports.getUser = async (event, context, callback) => {
       else
       {
       const userList = usersResult.Items;
-      const useremail = userList.email;
-      console.log(userList);
-      console.log(useremail);
-      
+      const useremail = userList[0].email;
+          
         const meetingData = {
           TableName: meetingsTable,              
           ExpressionAttributeValues: {
               ":v_meetingToken":  data.token,
-              //":v_email":  "jit.test2020@gmail.com"
-              ":v_email":  "sundarasokan1@gmail.com"
+              ":v_email": useremail 
           },
           FilterExpression: "meetingToken = :v_meetingToken AND email = :v_email"
-        };
-        console.log(meetingData);
+        };      
 
         try {
           const meetingResult = await db.scan(meetingData).promise();   
@@ -63,7 +58,7 @@ module.exports.getUser = async (event, context, callback) => {
       resBodyUser = `Unable to retrieve User data ${err}`;
       statusCode = 403;
     }    
-  
+   
     const response = {
         statusCode,
         headers: {
