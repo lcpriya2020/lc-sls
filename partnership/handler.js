@@ -7,8 +7,10 @@ module.exports.postpartnership = async (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
     const partnershipTable = process.env.TABLENAME;
       
-    let responseBody = '';
+    let resBody = '';
     let statusCode = 0;
+    let statusMsg = '';
+    let errorMsg = '';
   
     const data = JSON.parse(event.body);
     const partnershipData = {
@@ -35,15 +37,22 @@ module.exports.postpartnership = async (event, context, callback) => {
         AllowPrivacy: data.allowPrivacy      
       }
     };
+    const dbData = {
+      TableName: partnershipTable
+    }
   
     try {
       const data = await db.put(partnershipData).promise();
-      responseBody = JSON.stringify(data.Items);
+      const dataNew = await db.scan(dbData).promise(); 
+      resBody = JSON.stringify(dataNew.Items);
       statusCode = 200;
+      statusMsg = 'Success';
     } catch(err) {
-      responseBody = `Unable to save your Partnership information ${err}`;
-      statusCode = 403;
+      resBody = `Unable to save your Partnership information ${err}`;
+      statusCode = 400;
+      errorMsg = 'true';
     }    
+
     const response = {
       statusCode,
       headers: {
@@ -55,7 +64,9 @@ module.exports.postpartnership = async (event, context, callback) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        message: responseBody
+        data: resBody,
+        statusMessage: statusMsg,
+        errorMessage: errorMsg
       })
     };
   
@@ -67,8 +78,10 @@ module.exports.getpartnership = async (event, context, callback) => {
     const db = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
     const partnershipTable = process.env.TABLENAME;  
     
-    let responseBody = '';
+    let resBody = '';
     let statusCode = 0;
+    let statusMsg = '';
+    let errorMsg = '';
   
     const partnershipData = {
       TableName: partnershipTable
@@ -76,11 +89,13 @@ module.exports.getpartnership = async (event, context, callback) => {
   
     try {
       const data = await db.scan(partnershipData).promise();
-      responseBody = JSON.stringify(data.Items);
+      resBody = JSON.stringify(data.Items);
       statusCode = 200;
+      statusMsg = 'Success';
     } catch(err) {
-      responseBody = `Unable to retrieve Partnership data ${err}`;
-      statusCode = 403;
+      resBody = `Unable to retrieve Partnership data ${err}`;
+      statusCode = 400;
+      errorMsg = 'true';
     }    
     const response = {
       statusCode,
@@ -93,7 +108,9 @@ module.exports.getpartnership = async (event, context, callback) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        message: responseBody
+        data: resBody,
+        statusMessage: statusMsg,
+        errorMessage: errorMsg
       })
     };  
     return response;
