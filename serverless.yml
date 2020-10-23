@@ -122,6 +122,16 @@ functions:
       - http:
           path: /getUser
           method: post
+          cors: 
+  getMeeting:
+    handler: getMeeting/handler.getMeeting
+    environment:
+      TABLENAME_USERS: { "Ref": "users" }
+      TABLENAME_MEETINGS: { "Ref": "meetings" }
+    events:
+      - http:
+          path: /getMeeting
+          method: post
           cors: true
   signup:
     handler: signup/handler.signup
