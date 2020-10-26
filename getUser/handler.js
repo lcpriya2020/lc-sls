@@ -10,6 +10,8 @@ module.exports.getUser = async (event, context, callback) => {
     let resBodyUser = '';
     let resBodyMeeting = '';
     let statusCode = 0;
+    let statusMsg = '';
+    let errorMsg = '';
 
     const data = JSON.parse(event.body);   
   
@@ -28,7 +30,7 @@ module.exports.getUser = async (event, context, callback) => {
       {
         resBodyUser = `Unable to get User details`;
         resBodyMeeting = `Unable to get Meeting details`;
-        statusCode = 403;
+        statusCode = 400;
       }
       else
       {
@@ -45,18 +47,27 @@ module.exports.getUser = async (event, context, callback) => {
         };      
 
         try {
-          const meetingResult = await db.scan(meetingData).promise();   
-          resBodyUser = JSON.stringify(usersResult.Items);  
-          resBodyMeeting = JSON.stringify(meetingResult.Items);           
+          const meetingResult = await db.scan(meetingData).promise();    
+              
+          let meetingResultFinal = {...meetingResult.Items[0], "token" : meetingResult.Items[0].meetingToken};
+          delete meetingResultFinal.meetingToken;
+
+          let userResultFinal = {...usersResult.Items[0], "token" : usersResult.Items[0].userToken};
+          delete userResultFinal.userToken;
+
+          resBodyUser = userResultFinal;
+          resBodyMeeting = meetingResultFinal;
           statusCode = 200;
+          statusMsg = "Success";
         } catch(err) {
           resBodyMeeting = `Unable to retrieve Meeting data ${err}`;
-          statusCode = 403;
+          statusCode = 400;
+          errorMsg = 'true';
         }
       }        
     } catch(err) {
       resBodyUser = `Unable to retrieve User data ${err}`;
-      statusCode = 403;
+      statusCode = 400;
     }    
    
     const response = {
@@ -70,8 +81,12 @@ module.exports.getUser = async (event, context, callback) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          users: resBodyUser,
-          meetingsData: resBodyMeeting
+          data: {
+            users: resBodyUser,
+            meetingData: resBodyMeeting
+          },
+          statusMessage: statusMsg,
+          errorMessage: errorMsg
         })
     };
 
