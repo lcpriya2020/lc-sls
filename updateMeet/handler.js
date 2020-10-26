@@ -7,6 +7,8 @@ module.exports.updateMeet = async (event, context, callback) => {
   
   let resBodyMeeting = '';
   let statusCode = 0;
+  let statusMsg = '';
+  let errorMsg = '';
   
   const data = JSON.parse(event.body);   
 
@@ -30,6 +32,7 @@ module.exports.updateMeet = async (event, context, callback) => {
     {
       resBodyMeeting = `Unable to get Meeting details`;
       statusCode = 400;
+      errorMsg = 'true';
     }
     else
     {        
@@ -52,12 +55,17 @@ module.exports.updateMeet = async (event, context, callback) => {
          
             const UpdatedPC = await db.update(updatePCData).promise();        
             const meetingPCNew = await db.scan(meetingData).promise(); 
-            resBodyMeeting = JSON.stringify(meetingPCNew.Items);   
-            statusCode = 200;           
+            
+            let meetingPCFinal = {...meetingPCNew.Items[0], "token" : meetingPCNew.Items[0].meetingToken};
+            delete meetingPCFinal.meetingToken;
+
+            resBodyMeeting = meetingPCFinal;   
+            statusCode = 200;
+            statusMsg = "Success";          
       } 
 
       const enPC = JSON.stringify(data.enablePasscode);
-      console.log('enPC: ', enPC);
+      // console.log('enPC: ', enPC);
       if(enPC) {         
           let enablePasscodeVal = true;
           if(data.enablePasscode === true) enablePasscodeVal = true;
@@ -80,8 +88,13 @@ module.exports.updateMeet = async (event, context, callback) => {
          
             const UpdatedEnablePC = await db.update(updateEnablePCData).promise();        
             const meetingEnablePCNew = await db.scan(meetingData).promise(); 
-            resBodyMeeting = JSON.stringify(meetingEnablePCNew.Items);   
-            statusCode = 200;          
+
+            let meetingEnablePCFinal = {...meetingEnablePCNew.Items[0], "token" : meetingEnablePCNew.Items[0].meetingToken};
+            delete meetingEnablePCFinal.meetingToken;
+
+            resBodyMeeting = meetingEnablePCFinal;             
+            statusCode = 200;
+            statusMsg = "Success";          
       }
 
       if(data.themeName  && data.selectedTheme) {                   
@@ -103,17 +116,24 @@ module.exports.updateMeet = async (event, context, callback) => {
           
             const Updatedtheme = await db.update(updatethemeData).promise();        
             const meetingthemeNew = await db.scan(meetingData).promise(); 
-            resBodyMeeting = JSON.stringify(meetingthemeNew.Items);   
-            statusCode = 200;          
+
+            let meetingthemeNewFinal = {...meetingthemeNew.Items[0], "token" : meetingthemeNew.Items[0].meetingToken};
+            delete meetingthemeNewFinal.meetingToken;
+
+            resBodyMeeting = meetingthemeNewFinal;               
+            statusCode = 200;
+            statusMsg = "Success";         
       } 
       } catch(err) {
         resBodyMeeting = `Unable to update data for meeting ID ${err}`;
-        statusCode = 400;         
+        statusCode = 400;
+        errorMsg = 'true';         
       }  
     }  
   } catch(err) {
     resBodyMeeting = `Unable to get meeting details ${err}`;
     statusCode = 400;
+    errorMsg = 'true';
   }     
 
     const response = {
@@ -127,8 +147,10 @@ module.exports.updateMeet = async (event, context, callback) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          data: resBodyMeeting 
-        })
+          data: resBodyMeeting,      
+          statusMessage: statusMsg,
+          errorMessage: errorMsg
+        })        
     };
 
     return response;
