@@ -7,47 +7,73 @@ module.exports.join = async (event, context, callback) => {
     
   let resBodyMeeting = '';
   let statusCode = 0;
+  let statusMsg = '';
+  let errorMsg = '';
 
   const data = JSON.parse(event.body);
+
+  const meetingId = parseInt(data.roomName);
+  let passcode = data.passcode; 
+  const pc = isNaN(passcode);
+  if (pc) {
+    passcode = data.passcode;
+  } else
+  {
+    passcode = parseInt(data.passcode); 
+  }
   
   try {
 
     const meetingData = {
       TableName: meetingsTable,
       ExpressionAttributeValues: {
-        ":v_meetingId":  data.roomName
+        ":v_meetingId":  meetingId
     },
     FilterExpression: "meetingId = :v_meetingId"
     };
    
     var meetingResult = await db.scan(meetingData).promise(); 
-    //resBodyMeeting = meetingResult.Items;
+    
+    let meetingResultFinal = {...meetingResult.Items[0], "token" : meetingResult.Items[0].meetingToken};
+    delete meetingResultFinal.meetingToken;
 
     if(meetingResult === null || meetingResult.Items === null || meetingResult.Items.length === 0)
     {
       resBodyMeeting = `Unable to get Meeting details`;
-      statusCode = 403;
+      statusCode = 400;
+      errorMsg = 'true';
     }
     else
-    {
-      if(data.enablePasscode && data.passcode === '16730')
-      {
-        resBodyMeeting = JSON.stringify(meetingResult.Items);           
+    {   
+      const dbenablePC = meetingResult.Items[0].enablePasscode;
+      const dbPC = meetingResult.Items[0].passcode;         
+
+      if (dbenablePC && dbPC === passcode)
+      {        
+        console.log('EnablePC + PC');
+        resBodyMeeting = meetingResultFinal;           
         statusCode = 200;
+        statusMsg = "Success";
       }
-      else if (!data.enablePasscode) {
-        resBodyMeeting = JSON.stringify(meetingResult.Items);           
+      else if (!dbenablePC) {
+        console.log('EnablePC');
+        resBodyMeeting = meetingResultFinal;           
         statusCode = 200;
+        statusMsg = "Success";
       }
       else
       {
-        resBodyMeeting = `Unable to get Meeting details`;
-        statusCode = 403;
-      }    
-    }    
+        console.log('No EnablePC, PC');
+        resBodyMeeting = `Invalid meeting details`;
+        statusCode = 400;
+        errorMsg = 'true';
+      } 
+    }
+  
   } catch(err) {
-    resBodyMeeting = `Unable to get meeting details ${err}`;
-    statusCode = 403;
+    resBodyMeeting = `Invalid meeting ID ${err}`;
+    statusCode = 400;
+    errorMsg = 'true';
   }    
   const response = {
     statusCode,
@@ -60,7 +86,9 @@ module.exports.join = async (event, context, callback) => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      meetingsData: resBodyMeeting
+      data: resBodyMeeting,      
+      statusMessage: statusMsg,
+      errorMessage: errorMsg
     })
   };
 

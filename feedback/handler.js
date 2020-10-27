@@ -9,6 +9,8 @@ module.exports.postfeedback = async (event, context, callback) => {
       
     let responseBody = '';
     let statusCode = 0;
+    let statusMsg = '';
+    let errorMsg = '';
   
     const data = JSON.parse(event.body);
     const feedbackData = {
@@ -26,9 +28,11 @@ module.exports.postfeedback = async (event, context, callback) => {
       const data = await db.put(feedbackData).promise();
       responseBody = JSON.stringify(data.Items);
       statusCode = 200;
+      statusMsg = "Success";
     } catch(err) {
       responseBody = `Unable to save your feedback ${err}`;
-      statusCode = 403;
+      statusCode = 400;
+      errorMsg = 'true';
     }    
     const response = {
       statusCode,
@@ -41,45 +45,53 @@ module.exports.postfeedback = async (event, context, callback) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        message: responseBody
+        data: responseBody,
+        statusMessage: statusMsg,
+        errorMessage: errorMsg
       })
     };  
     return response;
 };
   
-// Get all Feedback details
-module.exports.getfeedback = async (event, context, callback) => {
-    const db = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
-    const feedbackTable = process.env.TABLENAME;  
+// // Get all Feedback details
+// module.exports.getfeedback = async (event, context, callback) => {
+//     const db = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
+//     const feedbackTable = process.env.TABLENAME;  
     
-    let responseBody = '';
-    let statusCode = 0;
+//     let responseBody = '';
+//     let statusCode = 0;
+//     let statusMsg = '';
+//     let errorMsg = '';
   
-    const feedbackData = {
-      TableName: feedbackTable
-    };
+//     const feedbackData = {
+//       TableName: feedbackTable
+//     };
   
-    try {
-      const data = await db.scan(feedbackData).promise();
-      responseBody = JSON.stringify(data.Items);
-      statusCode = 200;
-    } catch(err) {
-      responseBody = `Unable to retrieve feedback data ${err}`;
-      statusCode = 403;
-    }    
-    const response = {
-      statusCode,
-      headers: {
-        'Access-Control-Allow-Headers' : 'Content-Type',
-        'Access-Control-Expose-Headers': 'Access-Control-Allow-Origin',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: responseBody
-      })
-    };  
-    return response;
-};  
+//     try {
+//       const data = await db.scan(feedbackData).promise();
+//       responseBody = JSON.stringify(data.Items);
+//       statusCode = 200;
+//       statusMsg = "Success";
+//     } catch(err) {
+//       responseBody = `Unable to retrieve feedback data ${err}`;
+//       statusCode = 400;
+//       errorMsg = 'true';
+//     }    
+//     const response = {
+//       statusCode,
+//       headers: {
+//         'Access-Control-Allow-Headers' : 'Content-Type',
+//         'Access-Control-Expose-Headers': 'Access-Control-Allow-Origin',
+//         'Access-Control-Allow-Origin': '*',
+//         'Access-Control-Allow-Credentials': true,
+//         'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify({
+//         data: responseBody,
+//         statusMessage: statusMsg,
+//         errorMessage: errorMsg
+//       })
+//     };  
+//     return response;
+// };  

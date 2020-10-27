@@ -11,6 +11,8 @@ const contactTemplateuser = "CONTACT_SALES_ACK";
 module.exports.postcontactus = async (event, context, callback) => {         
   let responseBody = '';
   let statusCode = 0;    
+  let statusMsg = '';
+  let errorMsg = '';
   const data = JSON.parse(event.body);
 
   // Send email
@@ -35,11 +37,12 @@ module.exports.postcontactus = async (event, context, callback) => {
 
   try {
     const result = await lambda.invoke(params).promise();     
-    responseBody = JSON.stringify(result, null, 2);
+    //responseBody = JSON.stringify(result, null, 2);
+    responseBody = "Email sent successfully";
     statusCode = 200;
   } catch(err) {
     responseBody = `Unable to send email ${err}`;
-    statusCode = 403;
+    statusCode = 400;
   } 
 
   // To user
@@ -62,11 +65,12 @@ module.exports.postcontactus = async (event, context, callback) => {
 
   try {
     const result = await lambda.invoke(userparams).promise();     
-    responseBody = JSON.stringify(result, null, 2);
+    //responseBody = JSON.stringify(result, null, 2);
+    responseBody = "Email sent successfully to user";
     statusCode = 200;
   } catch(err) {
     responseBody = `Unable to send email ${err}`;
-    statusCode = 403;
+    statusCode = 400;
   } 
 
   // Insert Contact data into DB    
@@ -93,9 +97,11 @@ module.exports.postcontactus = async (event, context, callback) => {
       const data = await db.put(contactData).promise();
       responseBody = JSON.stringify(data.Items);
       statusCode = 200;
+      statusMsg = "Success";
     } catch(err) {
       responseBody = `Unable to save your data ${err}`;
-      statusCode = 403;
+      statusCode = 400;
+      errorMsg = 'true';
     }    
     const response = {
       statusCode,
@@ -108,47 +114,55 @@ module.exports.postcontactus = async (event, context, callback) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        message: responseBody
+        data: responseBody,
+        statusMessage: statusMsg,
+        errorMessage: errorMsg
       })
     };
   
     return response;
 };
   
-// Get all Contactus details
-module.exports.getcontactus = async (event, context, callback) => {
-    const db = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
-    const contactTable = process.env.TABLENAME;  
+// // Get all Contactus details
+// module.exports.getcontactus = async (event, context, callback) => {
+//     const db = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
+//     const contactTable = process.env.TABLENAME;  
     
-    let responseBody = '';
-    let statusCode = 0;
+//     let responseBody = '';
+//     let statusCode = 0;
+//     let statusMsg = '';
+//     let errorMsg = '';
+
+//     const contactData = {
+//       TableName: contactTable
+//     };
   
-    const contactData = {
-      TableName: contactTable
-    };
+//     try {
+//       const data = await db.scan(contactData).promise();
+//       responseBody = JSON.stringify(data.Items);
+//       statusCode = 200;
+//       statusMsg = "Success";
+//     } catch(err) {
+//       responseBody = `Unable to retrieve Contactus data ${err}`;
+//       statusCode = 400;
+//       errorMsg = 'true';
+//     }    
+//     const response = {
+//       statusCode,
+//       headers: {
+//         'Access-Control-Allow-Headers' : 'Content-Type',
+//         'Access-Control-Expose-Headers': 'Access-Control-Allow-Origin',
+//         'Access-Control-Allow-Origin': '*',
+//         'Access-Control-Allow-Credentials': true,
+//         'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify({
+//         data: responseBody,
+//         statusMessage: statusMsg,
+//         errorMessage: errorMsg
+//       })
+//     };
   
-    try {
-      const data = await db.scan(contactData).promise();
-      responseBody = JSON.stringify(data.Items);
-      statusCode = 200;
-    } catch(err) {
-      responseBody = `Unable to retrieve Contactus data ${err}`;
-      statusCode = 403;
-    }    
-    const response = {
-      statusCode,
-      headers: {
-        'Access-Control-Allow-Headers' : 'Content-Type',
-        'Access-Control-Expose-Headers': 'Access-Control-Allow-Origin',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: responseBody
-      })
-    };
-  
-    return response;
-};
+//     return response;
+// };
