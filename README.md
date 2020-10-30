@@ -245,4 +245,30 @@ module.exports.deletemeeting = async (event, context, callback) => {
           path: /meeting/{id}
           method: get  
           cors: true  
-
+  getcontactus:
+    handler: contactus/handler.getcontactus
+    environment:
+      TABLENAME: { "Ref": "contactus" }
+    events:
+      - http:
+          path: /contactus
+          method: get
+          cors: true   
+  getfeedback:
+    handler: feedback/handler.getfeedback
+    environment:
+      TABLENAME: { "Ref": "feedbacks" }
+    events:
+      - http:
+          path: /feedback
+          method: get
+          cors: true     
+  getpartnership:
+    handler: partnership/handler.getpartnership
+    environment:
+      TABLENAME: { "Ref": "partnership" }
+    events:
+      - http:
+          path: /partnership
+          method: get
+          cors: true

@@ -83,13 +83,13 @@ module.exports.postcontactus = async (event, context, callback) => {
         id: uuidv4(),
         createdTime: Date.now(),
         email: data.email,
-        companyname: data.companyName,
-        empcount: data.employeeCount,
+        companyName: data.companyName,
+        employeeCount: data.employeeCount,
         phone: data.phone,
         country: data.country,
         state: data.state,
         zipCode: data.zipCode,
-        info: data.additionalInfo
+        additionalInfo: data.additionalInfo
       }
     };
   

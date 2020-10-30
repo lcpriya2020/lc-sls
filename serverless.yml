@@ -170,16 +170,7 @@ functions:
       - http:
           path: /updateMeet
           method: post
-          cors: true
-  postmeeting:
-    handler: handler.postmeeting
-    environment:
-      TABLENAME: { "Ref": "meetings" }
-    events:
-      - http:
-          path: /meeting
-          method: post 
-          cors: true
+          cors: true 
   postcontactus:
     handler: contactus/handler.postcontactus
     environment:
@@ -189,15 +180,6 @@ functions:
       - http:
           path: /contactus
           method: post
-          cors: true   
-  getcontactus:
-    handler: contactus/handler.getcontactus
-    environment:
-      TABLENAME: { "Ref": "contactus" }
-    events:
-      - http:
-          path: /contactus
-          method: get
           cors: true      
   postfeedback:
     handler: feedback/handler.postfeedback
@@ -208,15 +190,6 @@ functions:
           path: /feedback
           method: post  
           cors: true   
-  getfeedback:
-    handler: feedback/handler.getfeedback
-    environment:
-      TABLENAME: { "Ref": "feedbacks" }
-    events:
-      - http:
-          path: /feedback
-          method: get
-          cors: true     
   postpartnership:
     handler: partnership/handler.postpartnership
     environment:
@@ -225,25 +198,7 @@ functions:
       - http:
           path: /partnership
           method: post  
-          cors: true   
-  getpartnership:
-    handler: partnership/handler.getpartnership
-    environment:
-      TABLENAME: { "Ref": "partnership" }
-    events:
-      - http:
-          path: /partnership
-          method: get
-          cors: true
-  postusers:
-    handler: handler.postusers
-    environment:
-      TABLENAME: { "Ref": "users" }
-    events:
-      - http:
-          path: /users
-          method: post  
-          cors: true 
+          cors: true     
   sendemail:
     handler: ses_email/handler.sendemail     
 
