@@ -68,8 +68,14 @@ module.exports.signup = async (event, context, callback) => {
 
       const meetingRes = await db.put(meetingData).promise();
 
-      resBodyUser = JSON.stringify(userRes.Items);
-      resBodyMeeting = JSON.stringify(meetingRes.Items);    
+      let meetingResultFinal = {...meetingData.Item, "token" : meetingData.Item.meetingToken};
+      delete meetingResultFinal.meetingToken;
+
+      let userResultFinal = {...usersData.Item, "token" : usersData.Item.userToken};
+      delete userResultFinal.userToken;
+
+      resBodyUser = userResultFinal;
+      resBodyMeeting = meetingResultFinal;    
 
       statusCode = 200;
     }
@@ -78,7 +84,7 @@ module.exports.signup = async (event, context, callback) => {
         const meetingData = {
           TableName: meetingsTable,              
           ExpressionAttributeValues: {
-              ":v_meetingToken":  "2Y5PHBpKBa6NZsB9Ku8cDF",
+              ":v_meetingToken":  usersResult.Items[0].userToken,
               ":v_email":  data.email
           },
 
@@ -87,18 +93,25 @@ module.exports.signup = async (event, context, callback) => {
 
         try {
           const meetingResult = await db.scan(meetingData).promise();
-          resBodyUser = usersData;
-          resBodyMeeting = JSON.stringify(meetingResult.Items);           
+
+          let meetingResultFinal = {...meetingResult.Items[0], "token" : meetingResult.Items[0].meetingToken};
+          delete meetingResultFinal.meetingToken;
+
+          let userResultFinal = {...usersData.Item, "token" : usersData.Item.userToken};
+          delete userResultFinal.userToken;
+
+          resBodyUser = userResultFinal;
+          resBodyMeeting = meetingResultFinal;           
           statusCode = 200;
         } catch(err) {
           resBodyMeeting = `Unable to retrieve Meeting data ${err}`;
-          statusCode = 403;
+          statusCode = 400;
         }      
     }    
   } catch(err) {
     resBodyUser = `Unable to create User details ${err}`;
     resBodyMeeting = `Unable to create meeting details ${err}`;
-    statusCode = 403;
+    statusCode = 400;
   }    
   const response = {
     statusCode,

@@ -29,7 +29,7 @@ module.exports.getMeeting = async (event, context, callback) => {
       if(meetingResult === null || meetingResult.Items === null || meetingResult.Items.length === 0)
       {
         resBodyMeeting = `Unable to get Meeting details`;
-        statusCode = 403;
+        statusCode = 400;
       }
       else
       {
@@ -51,24 +51,29 @@ module.exports.getMeeting = async (event, context, callback) => {
           if(userResult === null || userResult.Items === null || userResult.Items.length === 0)
           {
             resBodyUser = `Unable to get User details`;
-            statusCode = 403;
+            statusCode = 400;
           }
           else
           {
-            resBodyUser = JSON.stringify(userResult.Items);  
+            resBodyUser = userResult.Items[0]; 
+
             fName = userResult.Items[0].firstname;
             lName = userResult.Items[0].lastname;
-            resBodyMeeting = JSON.stringify(meetingResult.Items);         
+
+            let meetingResultFinal = {...meetingResult.Items[0], "token" : meetingResult.Items[0].meetingToken};
+            delete meetingResultFinal.meetingToken;
+
+            resBodyMeeting = meetingResultFinal;
             statusCode = 200;
           }
         } catch(err) {
           resBodyMeeting = `Unable to retrieve user data ${err}`;
-          statusCode = 403;
+          statusCode = 400;
         }
       }        
     } catch(err) {
       resBodyUser = `Unable to retrieve User data ${err}`;
-      statusCode = 403;
+      statusCode = 400;
     }    
    
     const response = {

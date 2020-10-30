@@ -31,14 +31,14 @@ module.exports.login = async (event, context, callback) => {
     {
       resBodyUser = `Unable to get User details`;
       resBodyMeeting = `Unable to get Meeting details`;
-      statusCode = 403;
+      statusCode = 400;
     }
     else
     {
         const meetingData = {
           TableName: meetingsTable,              
           ExpressionAttributeValues: {
-              ":v_meetingToken":  "2Y5PHBpKBa6NZsB9Ku8cDF",
+              ":v_meetingToken":  usersResult.Items[0].userToken,
               ":v_email":  data.email
           },
 
@@ -47,18 +47,25 @@ module.exports.login = async (event, context, callback) => {
 
         try {
           const meetingResult = await db.scan(meetingData).promise();
-          resBodyUser = JSON.stringify(usersResult.Items);
-          resBodyMeeting = JSON.stringify(meetingResult.Items);           
+
+          let meetingResultFinal = {...meetingResult.Items[0], "token" : meetingResult.Items[0].meetingToken};
+          delete meetingResultFinal.meetingToken;
+
+          let userResultFinal = {...usersResult.Items[0], "token" : usersResult.Items[0].userToken};
+          delete userResultFinal.userToken;
+
+          resBodyUser = userResultFinal;
+          resBodyMeeting = meetingResultFinal;           
           statusCode = 200;
         } catch(err) {
           resBodyMeeting = `Unable to retrieve Meeting data ${err}`;
-          statusCode = 403;
+          statusCode = 400;
         }      
     }    
   } catch(err) {
     resBodyUser = `Unable to get User details ${err}`;
     resBodyMeeting = `Unable to get meeting details ${err}`;
-    statusCode = 403;
+    statusCode = 400;
   }    
   const response = {
     statusCode,
