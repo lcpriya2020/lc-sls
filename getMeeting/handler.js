@@ -12,6 +12,8 @@ module.exports.getMeeting = async (event, context, callback) => {
     let fName = '';
     let lName = '';
     let statusCode = 0;
+    let statusMsg = '';
+    let errorMsg = '';
 
     const data = JSON.parse(event.body);   
 
@@ -30,6 +32,7 @@ module.exports.getMeeting = async (event, context, callback) => {
       {
         resBodyMeeting = `Unable to get Meeting details`;
         statusCode = 400;
+        errorMsg = 'true';
       }
       else
       {
@@ -52,6 +55,7 @@ module.exports.getMeeting = async (event, context, callback) => {
           {
             resBodyUser = `Unable to get User details`;
             statusCode = 400;
+            errorMsg = 'true';
           }
           else
           {
@@ -65,15 +69,18 @@ module.exports.getMeeting = async (event, context, callback) => {
 
             resBodyMeeting = meetingResultFinal;
             statusCode = 200;
+            statusMsg = 'Success';
           }
         } catch(err) {
           resBodyMeeting = `Unable to retrieve user data ${err}`;
           statusCode = 400;
+          errorMsg = 'true';
         }
       }        
     } catch(err) {
       resBodyUser = `Unable to retrieve User data ${err}`;
       statusCode = 400;
+      errorMsg = 'true';
     }    
    
     const response = {
@@ -86,10 +93,15 @@ module.exports.getMeeting = async (event, context, callback) => {
           'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({          
-          meetingsData: resBodyMeeting,
-          firstName: fName,
-          lastname: lName
+        body: JSON.stringify({  
+          data: {        
+          meetingsData: {...resBodyMeeting,
+                        firstName: fName,
+                        lastname: lName
+            },
+          },
+          statusMessage: statusMsg,
+          errorMessage: errorMsg
         })
     };
 
