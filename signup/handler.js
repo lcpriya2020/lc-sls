@@ -11,6 +11,8 @@ module.exports.signup = async (event, context, callback) => {
   let resBodyUser = '';
   let resBodyMeeting = '';
   let statusCode = 0;
+  let statusMsg = '';
+  let errorMsg = '';
 
   const tokgen = new TokenGenerator();
   var userToken = tokgen.generate();
@@ -78,6 +80,7 @@ module.exports.signup = async (event, context, callback) => {
       resBodyMeeting = meetingResultFinal;    
 
       statusCode = 200;
+      statusMsg = "Success";
     }
     else
     {
@@ -103,15 +106,18 @@ module.exports.signup = async (event, context, callback) => {
           resBodyUser = userResultFinal;
           resBodyMeeting = meetingResultFinal;           
           statusCode = 200;
+          statusMsg = "Success";
         } catch(err) {
           resBodyMeeting = `Unable to retrieve Meeting data ${err}`;
           statusCode = 400;
+          errorMsg = 'true';
         }      
     }    
   } catch(err) {
     resBodyUser = `Unable to create User details ${err}`;
     resBodyMeeting = `Unable to create meeting details ${err}`;
     statusCode = 400;
+    errorMsg = 'true';
   }    
   const response = {
     statusCode,
@@ -124,8 +130,12 @@ module.exports.signup = async (event, context, callback) => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      users: resBodyUser,
-      meetingsData: resBodyMeeting
+      data: {
+        users: resBodyUser,
+        meetingData: resBodyMeeting
+      },
+      statusMessage: statusMsg,
+      errorMessage: errorMsg
     })
   };
 
