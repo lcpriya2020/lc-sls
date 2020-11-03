@@ -16,18 +16,17 @@ module.exports.getMeeting = async (event, context, callback) => {
     let errorMsg = '';
 
     const data = JSON.parse(event.body);   
-
+    const meetId = parseInt(data.meetingId);
     const meetingsData = {
       TableName: meetingsTable,              
       ExpressionAttributeValues: {
-          ":v_meetingId":  data.meetingId          
+          ":v_meetingId":  meetId         
       },
       FilterExpression: "meetingId = :v_meetingId"
     };      
 
     try {
       const meetingResult = await db.scan(meetingsData).promise();
-      
       if(meetingResult === null || meetingResult.Items === null || meetingResult.Items.length === 0)
       {
         resBodyMeeting = `Unable to get Meeting details`;
