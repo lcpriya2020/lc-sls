@@ -101,7 +101,7 @@ module.exports.postcontactus = async (event, context, callback) => {
     } catch(err) {
       responseBody = `Unable to save your data ${err}`;
       statusCode = 400;
-      errorMsg = 'true';
+      errorMsg = responseBody;
     }    
     const response = {
       statusCode,

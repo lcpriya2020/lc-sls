@@ -110,14 +110,14 @@ module.exports.signup = async (event, context, callback) => {
         } catch(err) {
           resBodyMeeting = `Unable to retrieve Meeting data ${err}`;
           statusCode = 400;
-          errorMsg = 'true';
+          errorMsg = resBodyMeeting;
         }      
     }    
   } catch(err) {
     resBodyUser = `Unable to create User details ${err}`;
     resBodyMeeting = `Unable to create meeting details ${err}`;
     statusCode = 400;
-    errorMsg = 'true';
+    errorMsg = 'Unable to create User/Meeting details';
   }    
   const response = {
     statusCode,

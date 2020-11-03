@@ -12,16 +12,9 @@ module.exports.join = async (event, context, callback) => {
 
   const data = JSON.parse(event.body);
 
-  const meetingId = parseInt(data.roomName);
+  const meetingId = Number(data.roomName);
   let passcode = data.passcode; 
-  const pc = isNaN(passcode);
-  if (pc) {
-    passcode = data.passcode;
-  } else
-  {
-    passcode = parseInt(data.passcode); 
-  }
-  
+    
   try {
 
     const meetingData = {
@@ -41,14 +34,14 @@ module.exports.join = async (event, context, callback) => {
     {
       resBodyMeeting = `Unable to get Meeting details`;
       statusCode = 400;
-      errorMsg = 'true';
+      errorMsg = resBodyMeeting;
     }
     else
     {   
       const dbenablePC = meetingResult.Items[0].enablePasscode;
       const dbPC = meetingResult.Items[0].passcode;         
 
-      if (dbenablePC && dbPC === passcode)
+      if (dbenablePC && dbPC.toString() === passcode.toString())
       {        
         console.log('EnablePC + PC');
         resBodyMeeting = meetingResultFinal;           
@@ -64,16 +57,16 @@ module.exports.join = async (event, context, callback) => {
       else
       {
         console.log('No EnablePC, PC');
-        resBodyMeeting = `Invalid meeting details`;
+        resBodyMeeting = `Invalid passcode`;
         statusCode = 400;
-        errorMsg = 'true';
+        errorMsg = resBodyMeeting;
       } 
     }
   
   } catch(err) {
     resBodyMeeting = `Invalid meeting ID ${err}`;
     statusCode = 400;
-    errorMsg = 'true';
+    errorMsg = resBodyMeeting;
   }    
   const response = {
     statusCode,

@@ -46,7 +46,7 @@ module.exports.postpartnership = async (event, context, callback) => {
     } catch(err) {
       resBody = `Unable to save your Partnership information ${err}`;
       statusCode = 400;
-      errorMsg = 'true';
+      errorMsg = resBody;
     }    
 
     const response = {

@@ -62,7 +62,7 @@ module.exports.getUser = async (event, context, callback) => {
         } catch(err) {
           resBodyMeeting = `Unable to retrieve Meeting data ${err}`;
           statusCode = 400;
-          errorMsg = 'true';
+          errorMsg = resBodyMeeting;
         }
       }        
     } catch(err) {

@@ -16,7 +16,7 @@ module.exports.getMeeting = async (event, context, callback) => {
     let errorMsg = '';
 
     const data = JSON.parse(event.body);   
-    const meetId = parseInt(data.meetingId);
+    const meetId = Number(data.meetingId);
     const meetingsData = {
       TableName: meetingsTable,              
       ExpressionAttributeValues: {
@@ -31,7 +31,7 @@ module.exports.getMeeting = async (event, context, callback) => {
       {
         resBodyMeeting = `Unable to get Meeting details`;
         statusCode = 400;
-        errorMsg = 'true';
+        errorMsg = resBodyMeeting;
       }
       else
       {
@@ -54,7 +54,7 @@ module.exports.getMeeting = async (event, context, callback) => {
           {
             resBodyUser = `Unable to get User details`;
             statusCode = 400;
-            errorMsg = 'true';
+            errorMsg = resBodyUser;
           }
           else
           {
@@ -73,13 +73,13 @@ module.exports.getMeeting = async (event, context, callback) => {
         } catch(err) {
           resBodyMeeting = `Unable to retrieve user data ${err}`;
           statusCode = 400;
-          errorMsg = 'true';
+          errorMsg = resBodyMeeting;
         }
       }        
     } catch(err) {
       resBodyUser = `Unable to retrieve User data ${err}`;
       statusCode = 400;
-      errorMsg = 'true';
+      errorMsg = resBodyUser;
     }    
    
     const response = {

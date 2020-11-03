@@ -34,7 +34,7 @@ module.exports.login = async (event, context, callback) => {
       resBodyUser = `Unable to get User details`;
       resBodyMeeting = `Unable to get Meeting details`;
       statusCode = 400;
-      errorMsg = 'true';      
+      errorMsg = 'Unable to get User/Meeting details';      
     }
     else
     {
@@ -64,14 +64,14 @@ module.exports.login = async (event, context, callback) => {
         } catch(err) {
           resBodyMeeting = `Unable to retrieve Meeting data ${err}`;
           statusCode = 400;
-          errorMsg = 'true';
+          errorMsg = resBodyMeeting;
         }      
     }    
   } catch(err) {
     resBodyUser = `Unable to get User details ${err}`;
     resBodyMeeting = `Unable to get meeting details ${err}`;
     statusCode = 400;
-    errorMsg = 'true';
+    errorMsg = 'Unable to get User/Meeting details';
   }    
   const response = {
     statusCode,

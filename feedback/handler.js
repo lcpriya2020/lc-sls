@@ -32,7 +32,7 @@ module.exports.postfeedback = async (event, context, callback) => {
     } catch(err) {
       responseBody = `Unable to save your feedback ${err}`;
       statusCode = 400;
-      errorMsg = 'true';
+      errorMsg = responseBody;
     }    
     const response = {
       statusCode,
