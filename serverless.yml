@@ -43,7 +43,8 @@ provider:
         - { "Fn::GetAtt": ["feedbacks", "Arn"] }
         - { "Fn::GetAtt": ["partnership", "Arn"] }   
         - "arn:aws:ses:${self:provider.region}:*:*"
-        - "arn:aws:lambda:${self:provider.region}:*:*"        
+        - "arn:aws:lambda:${self:provider.region}:*:*"       
+        - "arn:aws:events:${self:provider.region}:*:*" 
 resources:
   Resources:
     meetings:
@@ -200,7 +201,17 @@ functions:
           method: post  
           cors: true     
   sendemail:
-    handler: ses_email/handler.sendemail     
+    handler: ses_email/handler.sendemail   
+  userExpiry:
+    handler: scheduleTask/handler.userExpiry
+    environment:
+      TABLENAME_USERS: { "Ref": "users" }
+    events:
+      - schedule: 
+          rate: cron(0/10 * * * ? *) 
+          enabled: true
+          name: userExpiry
+          description: 'Update users table after trial expiry'
 
 # you can add CloudFormation resource templates here
 #resources:
