@@ -94,7 +94,7 @@ module.exports.getMeeting = async (event, context, callback) => {
         },
         body: JSON.stringify({  
           data: {        
-          meetingsData: {...resBodyMeeting,
+          meetingData: {...resBodyMeeting,
                         firstName: fName,
                         lastname: lName
             },
