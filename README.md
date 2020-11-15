@@ -331,15 +331,6 @@ module.exports.deletemeeting = async (event, context, callback) => {
 //  };
 
 // YML function example
-  getmeeting:
-    handler: handler.getmeeting
-    environment:
-      TABLENAME: { "Ref": "meetings" }
-    events:
-      - http:
-          path: /meeting
-          method: get  
-          cors: true   
   getonemeeting:
     handler: handler.getonemeeting
     environment:
