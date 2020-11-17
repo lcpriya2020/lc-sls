@@ -1,0 +1,18 @@
+version: 1.0
+backend:
+  phases:
+    install:
+      commands:
+        - npm install
+        - npm install -g serverless
+    build:
+      commands:
+        - serverless deploy
+  # artifacts:
+  #   # IMPORTANT - Please verify your build output directory
+  #   baseDirectory: /
+  #   files:
+  #     - '**/*'
+  # cache:
+  #   paths:
+  #     - node_modules/**/*
